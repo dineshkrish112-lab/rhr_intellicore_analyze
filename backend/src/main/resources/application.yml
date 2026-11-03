@@ -1,0 +1,48 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: rhr-intellicore-iot
+  config:
+    # Machine-specific secrets (DB password etc.) live in application-local.yml, which git ignores.
+    import: optional:classpath:application-local.yml
+  datasource:
+    url: jdbc:mysql://localhost:3306/rhr_iot_dashboard?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata&rewriteBatchedStatements=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Kolkata
+  jackson:
+    time-zone: Asia/Kolkata
+    serialization:
+      write-dates-as-timestamps: false
+
+app:
+  timezone: Asia/Kolkata
+  # Origin patterns allowed to call the API (the Vite dev server proxies /api as well)
+  cors-origins: ${APP_CORS_ORIGINS:http://localhost:*,http://127.0.0.1:*}
+  jwt:
+    # Override in production with a 32+ char secret via APP_JWT_SECRET
+    secret: ${APP_JWT_SECRET:rhr-intellicore-iot-dev-secret-key-change-me-0123456789}
+    expiry-hours: 12
+  auth:
+    # Static OTP for mobile login until an SMS gateway is wired in
+    static-otp: ${APP_STATIC_OTP:123456}
+  iot:
+    # Shared key devices / gateways send in the X-Device-Key header
+    device-key: ${APP_DEVICE_KEY:RHR-IOT-DEVICE-KEY-2026}
+    offline-after-seconds: 30
+    reading-retention-days: 7
+  simulator:
+    # Generates telemetry for machines that have no real device pushing data
+    enabled: ${APP_SIMULATOR:true}
+    interval-ms: 5000
+  seed:
+    history-days: 420

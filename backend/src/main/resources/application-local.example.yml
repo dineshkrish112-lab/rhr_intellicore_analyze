@@ -1,0 +1,5 @@
+# Copy to application-local.yml (git-ignored) and fill in your local MySQL credentials.
+spring:
+  datasource:
+    username: root
+    password: your-mysql-password
