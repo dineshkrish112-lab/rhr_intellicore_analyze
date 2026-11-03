@@ -165,7 +165,7 @@ export default function Login() {
   const { dark, toggle } = useTheme()
 
   return (
-    <main className="bg-white dark:bg-gray-900 min-h-[100dvh] flex">
+    <main className="bg-white dark:bg-gray-950 min-h-[100dvh] flex">
       <div className="w-full md:w-1/2 flex flex-col">
         <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
           <Logo />
@@ -209,7 +209,8 @@ export default function Login() {
       </div>
 
       <div className="hidden md:flex md:w-1/2 relative overflow-hidden bg-gray-900">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-700 via-brand-900 to-gray-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-700 via-brand-500 to-sky-400" />
+        <div className="absolute -right-24 -bottom-24 w-[28rem] h-[28rem] rounded-full bg-white/10 blur-3xl" />
         <svg className="absolute inset-0 w-full h-full opacity-[0.15]" aria-hidden="true">
           <defs>
             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -219,18 +220,18 @@ export default function Login() {
           <rect width="100%" height="100%" fill="url(#grid)" />
         </svg>
         <div className="relative z-10 flex flex-col justify-center px-12 lg:px-16 text-white">
-          <div className="text-xs uppercase tracking-[0.2em] text-brand-200 font-semibold mb-4">Spinning Unit 1 · Coimbatore</div>
+          <div className="text-xs uppercase tracking-[0.2em] text-white/80 font-semibold mb-4">Spinning Unit 1 · Coimbatore</div>
           <h2 className="text-3xl lg:text-4xl font-bold leading-tight mb-4">Every machine. Every shift.<br />One live view.</h2>
-          <p className="text-brand-100/80 mb-10 max-w-md">Connected carding, draw frame, simplex, ring frame and autoconer lines reporting in real time.</p>
+          <p className="text-white/85 mb-10 max-w-md">Connected carding, draw frame, simplex, ring frame and autoconer lines reporting in real time.</p>
           <div className="space-y-5">
             {FEATURES.map(({ icon: Icon, title, text }) => (
               <div key={title} className="flex gap-4">
-                <div className="w-10 h-10 shrink-0 rounded-lg bg-white/10 flex items-center justify-center">
+                <div className="w-10 h-10 shrink-0 rounded-xl bg-white/20 ring-1 ring-white/30 flex items-center justify-center">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="font-semibold">{title}</div>
-                  <div className="text-sm text-brand-100/70">{text}</div>
+                  <div className="text-sm text-white/75">{text}</div>
                 </div>
               </div>
             ))}

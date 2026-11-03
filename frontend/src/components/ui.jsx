@@ -39,7 +39,7 @@ export function InfoTip({ text }) {
       <button type="button" className="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 text-[10px] font-bold leading-none text-gray-400 hover:text-brand-600 hover:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30" aria-label={text}>
         i
       </button>
-      <span role="tooltip" className="pointer-events-none absolute z-50 left-1/2 -translate-x-1/2 top-6 w-60 rounded-lg bg-ink-900 text-gray-100 text-xs font-medium leading-relaxed px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition">
+      <span role="tooltip" className="pointer-events-none absolute z-50 left-1/2 -translate-x-1/2 top-6 w-60 rounded-lg bg-gray-900 text-gray-100 text-xs font-medium leading-relaxed px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition">
         {text}
       </span>
     </span>

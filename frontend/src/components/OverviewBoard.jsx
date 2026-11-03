@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { RefreshCw, RotateCcw, Package, Zap, Clock, AlertTriangle, Cpu, Waves } from 'lucide-react'
+import { RefreshCw, RotateCcw, Zap, Clock, AlertTriangle, Cpu, Waves } from 'lucide-react'
 import { api } from '../lib/api.js'
 import { fmt0, fmt1, fmtKg, isoDate } from '../lib/format.js'
 import { Segmented, Alert, Spinner } from './ui.jsx'
@@ -33,18 +33,54 @@ function normalise(saved, defaults) {
   return [...known, ...defaults.filter((id) => !known.includes(id))]
 }
 
-function Stat({ icon: Icon, label, value, hint }) {
+function GlassTile({ icon: Icon, label, value, hint }) {
   return (
-    <div className="card px-4 py-3 flex items-center gap-3">
-      <div className="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center shrink-0">
-        <Icon className="w-5 h-5" />
+    <div className="rounded-2xl bg-white/[0.14] ring-1 ring-white/25 backdrop-blur-sm px-4 py-3 min-w-0">
+      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/75">
+        <Icon className="w-3.5 h-3.5" /> {label}
       </div>
-      <div className="min-w-0">
-        <div className="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 truncate">{label}</div>
-        <div className="text-lg font-bold text-gray-800 dark:text-gray-100 tabular-nums truncate">{value}</div>
-        {hint && <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{hint}</div>}
-      </div>
+      <div className="num text-xl font-semibold text-white mt-0.5 truncate">{value}</div>
+      {hint && <div className="text-[11px] text-white/70 truncate">{hint}</div>}
     </div>
+  )
+}
+
+/** Blue status band: the day's output against target plus the handful of numbers a manager checks first. */
+function PlantPulse({ k, machines, activeAlarms, liveShift, selectedDate, isToday }) {
+  const running = machines.filter((m) => m.status === 'RUNNING').length
+  const pct = k.targetKg ? Math.min(100, (100 * k.productionKg) / k.targetKg) : 0
+  return (
+    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 via-brand-500 to-sky-400 text-white shadow-lift mb-5">
+      <div className="absolute inset-0 bg-grid-white [mask-image:linear-gradient(90deg,transparent,black_40%)]" aria-hidden="true" />
+      <div className="absolute -right-16 -top-24 w-80 h-80 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+      <div className="relative grid grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)] gap-6 p-6">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-white/80">
+            <span className={`w-2 h-2 rounded-full ${isToday ? 'bg-emerald-300 animate-pulse' : 'bg-white/60'}`} />
+            {isToday && liveShift ? `${liveShift.shift.name} in progress` : 'Historical day'} · <span className="num">{selectedDate}</span>
+          </div>
+          <div className="mt-3 text-sm font-medium text-white/80">Output so far</div>
+          <div className="flex items-baseline gap-2">
+            <span className="num text-5xl font-semibold tracking-tight">{fmt0(k.productionKg)}</span>
+            <span className="text-lg text-white/80">kg</span>
+          </div>
+          <div className="mt-3 h-2.5 rounded-full bg-white/20 overflow-hidden" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} aria-label="Output against target">
+            <div className="h-full rounded-full bg-white transition-all duration-700" style={{ width: `${pct}%` }} />
+          </div>
+          <div className="mt-1.5 flex justify-between text-xs text-white/80">
+            <span><span className="num font-semibold text-white">{fmt0(pct)}%</span> of day target</span>
+            <span className="num">{fmtKg(k.targetKg)}</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 2xl:grid-cols-5 gap-3 content-center">
+          <GlassTile icon={Cpu} label="Running" value={`${running}/${machines.length}`} hint="machines now" />
+          <GlassTile icon={AlertTriangle} label="Alarms" value={activeAlarms} hint="open right now" />
+          <GlassTile icon={Zap} label="Energy" value={`${fmt0(k.energyKwh)} kWh`} hint={k.productionKg ? `${fmt1(k.energyKwh / k.productionKg)} kWh / kg` : undefined} />
+          <GlassTile icon={Clock} label="Run / Down" value={`${fmt0(k.runHours)}h / ${fmt0(k.downHours)}h`} hint={`${k.stoppages} stoppages`} />
+          <GlassTile icon={Waves} label="CV index" value={fmt1(k.cvIndex)} hint="100 = on target" />
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -94,7 +130,6 @@ export default function OverviewBoard() {
     api('/dashboard/layout', { method: 'PUT', body: next }).catch(() => {})
   }
 
-  const running = machines.filter((m) => m.status === 'RUNNING').length
   const k = data?.kpi
 
   return (
@@ -133,10 +168,11 @@ export default function OverviewBoard() {
         <div className="card p-10 flex justify-center text-gray-400"><Spinner className="w-6 h-6" /></div>
       ) : (
         <>
+          <PlantPulse k={k} machines={machines} activeAlarms={activeAlarms} liveShift={liveShift} selectedDate={selectedDate} isToday={!date || date === productionDate} />
           <SortableGrid
             ids={layout.kpis}
             onReorder={(kpis) => saveLayout({ ...layout, kpis })}
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4"
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-5"
           >
             {layout.kpis.map((id) => (
               <SortableItem key={id} id={id}>
@@ -145,14 +181,6 @@ export default function OverviewBoard() {
             ))}
           </SortableGrid>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-            <Stat icon={Package} label="Production" value={fmtKg(k.productionKg)} hint={k.targetKg ? `${fmt0((100 * k.productionKg) / k.targetKg)}% of ${fmtKg(k.targetKg)} target` : undefined} />
-            <Stat icon={Zap} label="Energy" value={`${fmt0(k.energyKwh)} kWh`} hint={k.productionKg ? `${fmt1(k.energyKwh / k.productionKg)} kWh / kg` : undefined} />
-            <Stat icon={Clock} label="Run / Down" value={`${fmt0(k.runHours)}h / ${fmt0(k.downHours)}h`} hint={`${k.stoppages} stoppages`} />
-            <Stat icon={Waves} label="CV index" value={fmt1(k.cvIndex)} hint="100 = on target" />
-            <Stat icon={Cpu} label="Running now" value={`${running} / ${machines.length}`} hint="live machine count" />
-            <Stat icon={AlertTriangle} label="Active alarms" value={activeAlarms} hint={`${fmt0(k.breaks)} end breaks`} />
-          </div>
 
           <SortableGrid
             ids={layout.widgets}

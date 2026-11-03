@@ -101,7 +101,7 @@ function Section({ step, title, hint, children }) {
   return (
     <section className="py-5 border-b border-gray-100 dark:border-gray-800 last:border-0">
       <div className="flex items-start gap-3 mb-4">
-        <span className="num w-6 h-6 rounded-md bg-ink-900 dark:bg-brand-500/20 text-brand-300 text-xs font-bold flex items-center justify-center shrink-0">{step}</span>
+        <span className="num w-6 h-6 rounded-md bg-brand-600 dark:bg-brand-500/20 text-white dark:text-brand-300 text-xs font-bold flex items-center justify-center shrink-0">{step}</span>
         <div>
           <h3 className="font-bold text-gray-900 dark:text-gray-50">{title}</h3>
           {hint && <p className="text-xs text-gray-500 dark:text-gray-400">{hint}</p>}
@@ -275,7 +275,7 @@ function DeviceDrawer({ initial, protocols, machines, onClose, onSaved }) {
                 </div>
                 <div>
                   <div className="form-label">Expected payload</div>
-                  <pre className="num text-[11px] leading-relaxed bg-ink-900 text-gray-200 rounded-xl p-3 overflow-x-auto">{`{"machineCode":"RF-01","status":"RUNNING","speed":18200,"cvPercent":11.4,
+                  <pre className="num text-[11px] leading-relaxed bg-gray-900 text-sky-100 rounded-xl p-3 overflow-x-auto">{`{"machineCode":"RF-01","status":"RUNNING","speed":18200,"cvPercent":11.4,
  "temperature":33.2,"humidity":56,"powerKw":29.5,"productionKg":0.03}`}</pre>
                   <p className="form-hint">machineCode can be left out when the device is mapped to one machine below. Arrays of readings are accepted.</p>
                 </div>
@@ -341,7 +341,7 @@ function DeviceDrawer({ initial, protocols, machines, onClose, onSaved }) {
             {form.protocol === 'HTTP_PUSH' && (
               <div className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
                 <p>The device sends readings to us, so no address is needed. After saving you get a device key to put in the <span className="num">X-Device-Key</span> header.</p>
-                <pre className="num text-[11px] bg-ink-900 text-gray-200 rounded-xl p-3 overflow-x-auto">{`POST ${window.location.origin}/api/iot/telemetry
+                <pre className="num text-[11px] bg-gray-900 text-sky-100 rounded-xl p-3 overflow-x-auto">{`POST ${window.location.origin}/api/iot/telemetry
 X-Device-Key: ${initial?.apiKey || '<shown after saving>'}
 {"machineCode":"RF-01","humidity":56.2,"temperature":31.8}`}</pre>
               </div>
@@ -408,7 +408,7 @@ function DeviceCard({ view, admin, now, onEdit, onToggle, onDelete, onTest, onRe
   return (
     <article className="card p-5 flex flex-col gap-4">
       <div className="flex items-start gap-3">
-        <div className="w-11 h-11 rounded-xl bg-ink-900 dark:bg-gray-800 text-brand-300 flex items-center justify-center shrink-0">
+        <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 dark:bg-gray-800 dark:text-brand-300 flex items-center justify-center shrink-0">
           <Icon className="w-5 h-5" />
         </div>
         <div className="min-w-0 flex-1">
